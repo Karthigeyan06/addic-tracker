@@ -60,10 +60,44 @@
         .info {
             margin: 10px;
         }
+        #rankBox {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.3em;
+            color: gold;
+            
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            width: 80%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            margin: 30px auto;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            height: 6px;
+            width: 0%;
+            background: linear-gradient(90deg, #00ffcc, #00bcd4, #00ffcc);
+            background-size: 200% 100%;
+            animation: flow 2s linear infinite;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        @keyframes flow {
+            0% { background-position: 0% 0; }
+            100% { background-position: 200% 0; }
+        }
     </style>
 </head>
 <body>
-    <h1>Streak Tracker</h1>
+    <h1>🔥 Streak Tracker 🔥</h1>
 
     <div id="quoteBox">Loading quote...</div>
     <div id="motivationBox">Stay focused and strong.</div>
@@ -87,6 +121,12 @@
         <button onclick="resetAll()">⚠️ Reset</button>
     </div>
 
+    <div id="rankBox">Rank: 🪖 Recruit</div>
+
+    <div class="timeline">
+        <div class="timeline-progress" id="timelineProgress"></div>
+    </div>
+
     <script>
         let streak = parseInt(localStorage.getItem('streak')) || 0;
         let bestStreak = parseInt(localStorage.getItem('bestStreak')) || 0;
@@ -107,6 +147,16 @@
             document.getElementById('quoteBox').textContent = quotes[randomIndex];
         }
 
+        function getRank() {
+            const progress = (streak / goal) * 100;
+            if (progress < 20) return "🪖 Recruit";
+            if (progress < 40) return "🔰 Private";
+            if (progress < 60) return "🎖️ Corporal";
+            if (progress < 80) return "🪶 Sergeant";
+            if (progress < 100) return "⚔️ Lieutenant";
+            return "🏆 Captain";
+        }
+
         function updateMotivation() {
             const remaining = goal - streak;
             let message = '';
@@ -124,7 +174,10 @@
             document.getElementById('currentStreak').textContent = streak;
             document.getElementById('bestStreak').textContent = bestStreak;
             document.getElementById('goal').textContent = goal;
-            document.getElementById('progressBar').style.width = `${(streak/goal)*100}%`;
+            const progressPercent = (streak / goal) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            document.getElementById('timelineProgress').style.width = `${progressPercent}%`;
+            document.getElementById('rankBox').textContent = `Rank: ${getRank()}`;
             updateMotivation();
         }
 
