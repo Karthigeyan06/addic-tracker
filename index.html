@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streak Tracker</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+        }
+        #quoteBox, #motivationBox {
+            font-style: italic;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 500px;
+            transition: all 0.5s ease;
+        }
+        #progressBarContainer {
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 400px;
+        }
+        #progressBar {
+            height: 20px;
+            background: limegreen;
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        button {
+            background: #00bcd4;
+            border: none;
+            padding: 10px 15px;
+            color: white;
+            border-radius: 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #0097a7;
+        }
+        .info {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Streak Tracker</h1>
+
+    <div id="quoteBox">Loading quote...</div>
+    <div id="motivationBox">Stay focused and strong.</div>
+
+    <div class="info">
+        <p>Current Streak: <span id="currentStreak">0</span> days</p>
+        <p>Best Streak: <span id="bestStreak">0</span> days</p>
+        <p>Goal: <span id="goal">30</span> days</p>
+    </div>
+
+    <div id="progressBarContainer">
+        <div id="progressBar"></div>
+    </div>
+
+    <div>
+        <button onclick="markSuccess()">✅ Mark Successful Day</button>
+        <button onclick="markRelapse()">💀 Relapse</button>
+        <button onclick="undo()">↩️ Undo</button>
+        <button onclick="setGoal()">🎯 Set Goal</button>
+        <button onclick="shuffleQuote()">🔁 New Quote</button>
+        <button onclick="resetAll()">⚠️ Reset</button>
+    </div>
+
+    <script>
+        let streak = parseInt(localStorage.getItem('streak')) || 0;
+        let bestStreak = parseInt(localStorage.getItem('bestStreak')) || 0;
+        let goal = parseInt(localStorage.getItem('goal')) || 30;
+
+        const quotes = [
+            "One day at a time.",
+            "Every setback is a setup for a comeback.",
+            "Discipline is choosing what you want most over what you want now.",
+            "You didn’t come this far to only come this far.",
+            "Small steps every day lead to big change.",
+            "The pain you feel today will be your strength tomorrow.",
+            "Stay strong. The night is darkest before dawn."
+        ];
+
+        function shuffleQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            document.getElementById('quoteBox').textContent = quotes[randomIndex];
+        }
+
+        function updateMotivation() {
+            const remaining = goal - streak;
+            let message = '';
+            if (remaining > 1) {
+                message = `Only ${remaining} days to hit your goal — just push, mate! You’ve got this!`;
+            } else if (remaining === 1) {
+                message = 'Just 1 more day to achieve your goal! Stay strong for tomorrow!';
+            } else {
+                message = '🔥 Goal achieved! Keep the fire going!';
+            }
+            document.getElementById('motivationBox').textContent = message;
+        }
+
+        function updateDisplay() {
+            document.getElementById('currentStreak').textContent = streak;
+            document.getElementById('bestStreak').textContent = bestStreak;
+            document.getElementById('goal').textContent = goal;
+            document.getElementById('progressBar').style.width = `${(streak/goal)*100}%`;
+            updateMotivation();
+        }
+
+        function markSuccess() {
+            streak++;
+            if (streak > bestStreak) bestStreak = streak;
+            localStorage.setItem('streak', streak);
+            localStorage.setItem('bestStreak', bestStreak);
+            updateDisplay();
+            shuffleQuote();
+        }
+
+        function markRelapse() {
+            streak = 0;
+            localStorage.setItem('streak', 0);
+            updateDisplay();
+            alert('Don’t give up! Start again stronger.');
+        }
+
+        function undo() {
+            if (streak > 0) streak--;
+            localStorage.setItem('streak', streak);
+            updateDisplay();
+        }
+
+        function setGoal() {
+            const newGoal = parseInt(prompt('Enter your new goal (days):', goal));
+            if (!isNaN(newGoal) && newGoal > 0) {
+                goal = newGoal;
+                localStorage.setItem('goal', goal);
+                updateDisplay();
+            }
+        }
+
+        function resetAll() {
+            if (confirm('Are you sure you want to reset everything?')) {
+                localStorage.clear();
+                streak = 0;
+                bestStreak = 0;
+                goal = 30;
+                updateDisplay();
+                shuffleQuote();
+            }
+        }
+
+        shuffleQuote();
+        updateDisplay();
+    </script>
+</body>
+</html>
